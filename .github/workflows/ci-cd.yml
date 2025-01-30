@@ -39,8 +39,9 @@ jobs:
         path: dist/
 
   test:
-    name: Test Python ${{ matrix.python-version }}
-    runs-on: ubuntu-24.04
+    name: Test Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
       matrix:
         python-version:
@@ -51,6 +52,17 @@ jobs:
         - 3.11
         - 3.12
         - 3.13
+        os:
+        - ubuntu-24.04
+        - ubuntu-24.04-arm
+        include:
+        - experimental: false
+        - experimental: true
+          os: ubuntu-24.04-arm  # deal with flaky runners
+        - upload-coverage: false
+        - upload-coverage: true
+          python-version: 3.11
+          os: ubuntu-24.04
       fail-fast: false
     env:
       UV_FROZEN: 1
@@ -74,7 +86,7 @@ jobs:
       run: |
         uv run make mototest
     - name: Upload coverage to Codecov
-      if: matrix.python-version == '3.11'
+      if: ${{ matrix.upload-coverage }}
       uses: codecov/codecov-action@v5.3.1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}  # not required for public repos
@@ -98,29 +110,3 @@ jobs:
       with:
         jobs: ${{ toJSON(needs) }}
 
-  pypi-publish:
-    name: Publish Python 🐍 distribution 📦 to PyPI
-    if: github.ref_type == 'tag'  # only publish on tag pushes
-    needs:
-    - check
-    runs-on: ubuntu-24.04
-    environment:
-      name: pypi
-      url: https://pypi.org/project/aiobotocore/${{ github.ref_name }}
-    permissions:
-      # IMPORTANT: this permission is mandatory for trusted publishing
-      id-token: write
-    timeout-minutes: 5
-
-    steps:
-    - name: Download distribution 📦
-      uses: actions/download-artifact@v4
-      with:
-        name: python-package-distributions
-        path: dist/
-    - name: Check if distribution 📦 names match git tag
-      run: |
-        test -f "dist/aiobotocore-${{ github.ref_name }}.tar.gz"
-        test -f "dist/aiobotocore-${{ github.ref_name }}-py3-none-any.whl"
-    - name: Publish distribution 📦 to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
