@@ -89,7 +89,16 @@ jobs:
         uv run make mototest
     - name: dmesg
       if: always()
-      run: sudo dmesg -H
+      run: | 
+        sudo dmesg -HT > a.txt
+        cat a.txt
+        sudo chmod -R 777 /var/log
+
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: logs-${{ matrix.os }}-${{ matrix.version }}
+        path: /var/log/ # or path/to/artifact
 
   check:  # This job does nothing and is only used for the branch protection
     if: always()
