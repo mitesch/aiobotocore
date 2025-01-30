@@ -86,16 +86,6 @@ jobs:
         COLOR: 'yes'
       run: |
         uv run make mototest
-    - name: Upload coverage to Codecov
-      if: ${{ matrix.upload-coverage }}
-      uses: codecov/codecov-action@v5.3.1
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}  # not required for public repos
-        files: ./coverage.xml
-        flags: unittests  # optional
-        name: codecov-umbrella  # optional
-        fail_ci_if_error: true  # optional (default = false)
-        verbose: true  # optional (default = false)
 
   check:  # This job does nothing and is only used for the branch protection
     if: always()
