@@ -87,6 +87,8 @@ jobs:
         COLOR: 'yes'
       run: |
         uv run make mototest
+    - name: dmesg
+      run: sudo dmesg -H
 
   check:  # This job does nothing and is only used for the branch protection
     if: always()
