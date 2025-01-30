@@ -97,7 +97,7 @@ jobs:
     - uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: logs-${{ matrix.os }}-${{ matrix.version }}
+        name: logs-${{ matrix.os }}-${{ matrix.python-version }}
         path: /var/log/ # or path/to/artifact
 
   check:  # This job does nothing and is only used for the branch protection
