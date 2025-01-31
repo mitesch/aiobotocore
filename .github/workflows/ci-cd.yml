@@ -2,19 +2,12 @@
 name: CI/CD
 
 on:
-  merge_group:
   workflow_dispatch:
   push:
     branches:
     - master
-    tags:
-    - >-
-      [0-9]+.[0-9]+.[0-9]+
-  pull_request:
-    branches:
-    - master
-    - >-
-      [0-9].[0-9]+.[0-9]+
+  schedule:
+    - cron: "0 * * * *"   # <=== Change this value
 
 env:
   FORCE_COLOR: 1
